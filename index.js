@@ -3,17 +3,24 @@ import SimplexNoise from 'https://cdn.skypack.dev/simplex-noise@2.4.0';
 
 const path = document.querySelector('path');
 
+let tension = 1;
+
+//меняем резкость с помощью инпутов прогресса
+document.getElementById('tension').oninput = function onchangeTensionWidth () {
+  tension = document.getElementById('tension').value;
+}
+
 //создаем свои кастомные свойства
 
 const root = document.documentElement;
 
 //создаем главныe точек
 
-const createPoints = () => {
+const createPoints = num => {
   const points = [];
   
   //задаем сколько нам нужно точек
-  const numPoints = 6;
+  const numPoints = num;
 
   //равномерно расприделяем точки по колу
   const angleStep = (Math.PI * 2) / numPoints;
@@ -42,7 +49,14 @@ const createPoints = () => {
   return points;
 }
 
-const points = createPoints();
+let num = 7;
+
+let points = createPoints(num);
+
+document.getElementById('points').oninput = function onchangePointsWidth () {
+  num = document.getElementById('points').value;
+  points = createPoints(num);
+}
 
 const simplex = new SimplexNoise();
 
@@ -56,7 +70,7 @@ let hueNoiseOffset = 0;
 (function animate() {
   // generate a smooth continuous curve based on points, using Bezier curves. spline() will return an SVG path-data string.
   // The arguments are (points, tension, close). Play with tension and check out the effect!
-  path.setAttribute('d', spline(points, 1, true));
+  path.setAttribute('d', spline(points, tension, true));
 
   requestAnimationFrame(animate);
 
@@ -101,9 +115,9 @@ function noise(x, y) {
   return simplex.noise2D(x, y);
 }
 
-document.querySelector('path').addEventListener('mouseover', () => {
-  noiseStep = 0.01;
+path.addEventListener('click', () => {
+  noiseStep += 0.005;
 });
-document.querySelector('path').addEventListener('mouseleave', () => {
+path.addEventListener('mouseleave', () => {
   noiseStep = 0.005;
 });
